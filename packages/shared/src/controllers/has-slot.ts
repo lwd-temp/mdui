@@ -20,6 +20,14 @@ export class HasSlotController implements ReactiveController {
 
   public hostConnected(): void {
     this.host.shadowRoot!.addEventListener('slotchange', this.onSlotChange);
+
+    // 如果把 js 文件放在页面顶部，hostConnected 会在组件的开始标记加载完时执行，
+    // 此时组件内部元素还未解析，childNodes 是空的。因此等组件解析完后再执行一次更新
+    if (!this.host.childNodes.length) {
+      setTimeout(() => {
+        this.host.requestUpdate();
+      });
+    }
   }
 
   public hostDisconnected(): void {
